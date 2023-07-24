@@ -29,9 +29,11 @@ public class QuotationService {
 	@Inject
 	KafkaEvents kafkaEvents;
 	
+	private static final String PAIR_USD_BRL = "USD-BRL";
+	
 	public void getCurrencyPrice() {
 		
-		CurrencyPriceDTO currencyPriceInfo = currencyPriceClient.getPriceByPair("USD-BRL");
+		CurrencyPriceDTO currencyPriceInfo = currencyPriceClient.getPriceByPair(PAIR_USD_BRL);
 		
 		if(updateCurrencyInfoPrice(currencyPriceInfo)) {
 			kafkaEvents.sendNewKafkaEvent(QuotationDTO
@@ -49,7 +51,7 @@ public class QuotationService {
 		List<QuotationEntity> quotationList = quotationRepository.findAll().list();
 		
 		if(quotationList.isEmpty()) {
-			saveQuotation(currencyInfo);
+			saveQuotation(currencyPriceInfo);
 			updatePrice.set(true);
 		}
 		else {
@@ -57,11 +59,20 @@ public class QuotationService {
 			
 			if(currentPrice.floatValue() > lastDollarPrice.getCurrencyPrice().floatValue()) {
 				updatePrice.set(true);
-				saveQuotation(currencyInfo);
+				saveQuotation(currencyPriceInfo);
 			}
 		}
 		
-		//TODO saveQuotation method
 		return updatePrice.get();
+	}
+	
+	private void saveQuotation(CurrencyPriceDTO currencyInfo) {
+		QuotationEntity quotation = new QuotationEntity();
+		quotation.setDate(new Date());
+		quotation.setCurrencyPrice(new BigDecimal(currencyInfo.getUSDBRL().getBid()));
+		quotation.setPctChange(currencyInfo.getUSDBRL().getPctChange());
+		quotation.setPair(PAIR_USD_BRL);
+		
+		quotationRepository.persist(quotation);
 	}
 }

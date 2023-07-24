@@ -28,6 +28,11 @@
     </dependencies>
   </dependencyManagement>
   <dependencies>
+  	<!-- https://mvnrepository.com/artifact/io.quarkus/quarkus-quartz -->
+	<dependency>
+	    <groupId>io.quarkus</groupId>
+	    <artifactId>quarkus-quartz</artifactId>
+	</dependency>
   	<!-- https://mvnrepository.com/artifact/io.quarkus/quarkus-resteasy-reactive-jackson -->
 	<dependency>
 	    <groupId>io.quarkus</groupId>
