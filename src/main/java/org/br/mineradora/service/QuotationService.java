@@ -1,6 +1,7 @@
 package org.br.mineradora.service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -56,8 +57,9 @@ public class QuotationService {
 		}
 		else {
 			QuotationEntity lastDollarPrice = quotationList.get(quotationList.size() - 1);
-			
-			if(currentPrice.floatValue() > lastDollarPrice.getCurrencyPrice().floatValue()) {
+
+			if(currentPrice.setScale(2, RoundingMode.HALF_EVEN).floatValue() > 
+				lastDollarPrice.getCurrencyPrice().setScale(2, RoundingMode.HALF_EVEN).floatValue()) {
 				updatePrice.set(true);
 				saveQuotation(currencyPriceInfo);
 			}
